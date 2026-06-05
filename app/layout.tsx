@@ -16,9 +16,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "contribution-calendar — GitHub-style heatmap for React",
+  metadataBase: new URL("https://github-calendar-kappa.vercel.app"),
+  title: "github-calendar — GitHub-style heatmap for React",
   description:
-    "A fully customizable GitHub-style contributions heatmap for React. Supports themes, tooltips, custom cell shapes, and more.",
+    "A fully customizable, client-side fetched GitHub contributions heatmap for React. Support preset themes, tooltips, custom cell shapes, and more.",
+  openGraph: {
+    title: "github-calendar — GitHub-style heatmap for React",
+    description:
+      "A fully customizable, client-side fetched GitHub contributions heatmap for React. Support preset themes, tooltips, custom cell shapes, and more.",
+    url: "https://github-calendar-kappa.vercel.app",
+    siteName: "GitHub Calendar",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1024,
+        height: 1024,
+        alt: "github-calendar component preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "github-calendar — GitHub-style heatmap for React",
+    description:
+      "A fully customizable, client-side fetched GitHub contributions heatmap for React. Support preset themes, tooltips, custom cell shapes, and more.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
