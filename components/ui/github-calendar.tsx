@@ -1,22 +1,80 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
-import {
-  COLOR_THEMES,
-  getContributionLevel,
-  type ContributionDay,
-} from "@/lib/contribution-data";
 import { cn } from "@/lib/utils";
-import type { ContributionCalendarProps } from "./types";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types & Interfaces
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ContributionDay {
+  date: string; // ISO date string "YYYY-MM-DD"
+  count: number;
+}
+
+export type CellShape = "square" | "circle" | "rounded";
+export type WeekStart = "sun" | "mon";
+export type ColorScheme = "green" | "blue" | "purple" | "orange" | "pink" | "dracula" | "halloween";
+
+export interface GitHubCalendarProps {
+  /** GitHub username to fetch and display contributions for — required */
+  username: string;
+  /** Preset color theme name */
+  colorScheme?: ColorScheme;
+  /** Custom 5-stop color array: [empty, level1, level2, level3, level4] */
+  colors?: [string, string, string, string, string];
+  /** Cell width/height in px */
+  cellSize?: number;
+  /** Gap between cells in px */
+  cellGap?: number;
+  /** Shape of each cell */
+  cellShape?: CellShape;
+  /** Show hover tooltip with date + count */
+  showTooltip?: boolean;
+  /** Show month labels above the grid */
+  showMonthLabels?: boolean;
+  /** Show day-of-week labels on the left */
+  showDayLabels?: boolean;
+  /** First day of week */
+  weekStart?: WeekStart;
+  /** Staggered scale-in animation via Motion */
+  animate?: boolean;
+  /** Time range to display in the grid */
+  timeRange?: "3-months" | "6-months" | "1-year";
+  /** Callback fired when data is successfully loaded client-side */
+  onDataLoaded?: (data: ContributionDay[]) => void;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Constants & Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 const MONTH_LABELS = [
-  "Jan","Feb","Mar","Apr","May","Jun",
-  "Jul","Aug","Sep","Oct","Nov","Dec",
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
 // GitHub-style: only Mon / Wed / Fri shown
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+
+export const COLOR_THEMES: Record<ColorScheme, [string, string, string, string, string]> = {
+  green: ["#27272a", "#166534", "#16a34a", "#22c55e", "#4ade80"],
+  blue: ["#27272a", "#1e3a5f", "#1d4ed8", "#3b82f6", "#93c5fd"],
+  purple: ["#27272a", "#4a1d96", "#7c3aed", "#a855f7", "#d8b4fe"],
+  orange: ["#27272a", "#7c2d12", "#c2410c", "#f97316", "#fdba74"],
+  pink: ["#27272a", "#831843", "#be185d", "#ec4899", "#f9a8d4"],
+  dracula: ["#282a36", "#44475a", "#6272a4", "#bd93f9", "#50fa7b"],
+  halloween: ["#21262d", "#631c03", "#bd5604", "#fa7a18", "#f9f871"],
+};
+
+export function getContributionLevel(count: number): 0 | 1 | 2 | 3 | 4 {
+  if (count === 0) return 0;
+  if (count <= 3) return 1;
+  if (count <= 6) return 2;
+  if (count <= 9) return 3;
+  return 4;
+}
 
 interface TooltipState {
   visible: boolean;
@@ -28,12 +86,18 @@ interface TooltipState {
 
 function fmtDate(dateStr: string): string {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
-export function ContributionGrid({
-  data,
+// ─────────────────────────────────────────────────────────────────────────────
+// Components
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function GitHubCalendar({
+  username,
   colorScheme = "green",
   colors,
   cellSize = 14,
@@ -43,16 +107,70 @@ export function ContributionGrid({
   showMonthLabels = true,
   showDayLabels = true,
   weekStart = "sun",
-  onCellClick,
   animate = false,
   timeRange = "1-year",
-}: ContributionCalendarProps) {
+  onDataLoaded,
+}: GitHubCalendarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [data, setData] = useState<ContributionDay[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const [tooltip, setTooltip] = useState<TooltipState>({
-    visible: false, x: 0, y: 0, date: "", count: 0,
+    visible: false,
+    x: 0,
+    y: 0,
+    date: "",
+    count: 0,
   });
 
   const palette = colors ?? COLOR_THEMES[colorScheme] ?? COLOR_THEMES.green;
+
+  // ── Client-side fetch ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!username) return;
+
+    let isMounted = true;
+    setLoading(true);
+    setError(null);
+
+    fetch(`https://github-contributions-api.jogruber.de/v4/${username}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch contributions");
+        }
+        return res.json();
+      })
+      .then((json) => {
+        if (isMounted) {
+          const contributions = json?.contributions;
+          if (Array.isArray(contributions)) {
+            const mapped = contributions.map((day: any) => ({
+              date: day.date,
+              count: day.count,
+            }));
+            const sorted = mapped.sort((a, b) => a.date.localeCompare(b.date));
+            setData(sorted);
+            if (onDataLoaded) {
+              onDataLoaded(sorted);
+            }
+          } else {
+            throw new Error("Invalid response format");
+          }
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          setError(err.message || "An error occurred");
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [username]);
 
   // ── Filter data based on timeRange ────────────────────────────────────────
   const filteredData = useMemo(() => {
@@ -85,7 +203,10 @@ export function ContributionGrid({
     for (let i = 0; i < offset; i++) week.push(null);
     for (const day of filteredData) {
       week.push(day);
-      if (week.length === 7) { grid.push(week); week = []; }
+      if (week.length === 7) {
+        grid.push(week);
+        week = [];
+      }
     }
     if (week.length > 0) {
       while (week.length < 7) week.push(null);
@@ -114,7 +235,7 @@ export function ContributionGrid({
   }, [weeks]);
 
   const borderRadius = useMemo(() => {
-    if (cellShape === "circle")  return "50%";
+    if (cellShape === "circle") return "50%";
     if (cellShape === "rounded") return Math.max(3, Math.floor(cellSize / 3)) + "px";
     return "2px";
   }, [cellShape, cellSize]);
@@ -139,10 +260,86 @@ export function ContributionGrid({
     setTooltip((t) => ({ ...t, visible: false }));
   }, []);
 
-  const step  = cellSize + cellGap;
-  const LEFT  = showDayLabels ? 32 : 0;
-  const TOP   = showMonthLabels ? 22 : 0;
+  const step = cellSize + cellGap;
+  const LEFT = showDayLabels ? 32 : 0;
+  const TOP = showMonthLabels ? 22 : 0;
 
+  // ── Render Skeleton Loader ────────────────────────────────────────────────
+  const skeletonWeeksCount = useMemo(() => {
+    if (timeRange === "3-months") return 13;
+    if (timeRange === "6-months") return 26;
+    return 53;
+  }, [timeRange]);
+
+  const skeletonWeeks = useMemo(() => {
+    return Array.from({ length: skeletonWeeksCount }, () => Array(7).fill(null));
+  }, [skeletonWeeksCount]);
+
+  if (loading) {
+    const gridW = skeletonWeeksCount * step - cellGap;
+    const gridH = 7 * step - cellGap;
+
+    return (
+      <div
+        className="relative select-none animate-pulse"
+        style={{ width: gridW + LEFT, minHeight: gridH + TOP }}
+      >
+        {/* Month labels skeleton placeholder */}
+        {showMonthLabels && (
+          <div className="absolute top-0 flex gap-10" style={{ left: LEFT }}>
+            {Array.from({ length: Math.ceil(skeletonWeeksCount / 4.3) }).map((_, i) => (
+              <span key={i} className="h-3.5 w-7 rounded bg-zinc-800" />
+            ))}
+          </div>
+        )}
+
+        {/* Day-of-week labels skeleton placeholder */}
+        {showDayLabels && (
+          <div className="absolute left-0 flex flex-col justify-between" style={{ top: TOP, width: LEFT - 4, height: gridH }}>
+            {["Mon", "Wed", "Fri"].map((label, i) => (
+              <div key={i} className="flex h-3.5 items-center justify-end pr-1 text-[11px] text-zinc-600">
+                {label}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Cell grid skeleton placeholder */}
+        <div
+          className="absolute flex"
+          style={{ top: TOP, left: LEFT, gap: cellGap }}
+        >
+          {skeletonWeeks.map((week, wi) => (
+            <div key={wi} className="flex flex-col" style={{ gap: cellGap }}>
+              {week.map((_, di) => (
+                <div
+                  key={di}
+                  style={{
+                    width: cellSize,
+                    height: cellSize,
+                    backgroundColor: palette[0],
+                    borderRadius,
+                  }}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Render Error State ────────────────────────────────────────────────────
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-red-900/50 bg-red-950/20 py-8 px-4 text-center">
+        <p className="text-sm font-semibold text-red-400">Failed to load contributions</p>
+        <p className="mt-1 text-xs text-red-500/80">Could not retrieve data for @{username}. Please check the username or try again later.</p>
+      </div>
+    );
+  }
+
+  // ── Render actual Calendar ────────────────────────────────────────────────
   const gridW = weeks.length * step - cellGap;
   const gridH = 7 * step - cellGap;
 
@@ -200,7 +397,7 @@ export function ContributionGrid({
           <div key={wi} role="row" className="flex flex-col" style={{ gap: cellGap }}>
             {week.map((day, di) => {
               const level = day ? getContributionLevel(day.count) : 0;
-              const bg    = palette[level];
+              const bg = palette[level];
               const hasData = day !== null;
               return (
                 <motion.div
@@ -234,12 +431,6 @@ export function ContributionGrid({
                   )}
                   onMouseEnter={day ? (e) => handleMouseEnter(e, day) : undefined}
                   onMouseLeave={day ? handleMouseLeave : undefined}
-                  onClick={day && onCellClick ? () => onCellClick(day) : undefined}
-                  onKeyDown={
-                    day && onCellClick
-                      ? (e) => { if (e.key === "Enter" || e.key === " ") onCellClick(day); }
-                      : undefined
-                  }
                 />
               );
             })}
@@ -272,7 +463,7 @@ export function ContributionLegend({
   cellSize = 11,
 }: {
   colors?: [string, string, string, string, string];
-  colorScheme?: string;
+  colorScheme?: ColorScheme;
   cellSize?: number;
 }) {
   const palette = colors ?? COLOR_THEMES[colorScheme] ?? COLOR_THEMES.green;

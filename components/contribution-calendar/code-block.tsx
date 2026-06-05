@@ -88,22 +88,14 @@ function tokenise(line: string): Token[] {
 
 // ── Default snippet ───────────────────────────────────────────────────────────
 const DEFAULT_CODE = `// Install via shadcn registry
-// npx shadcn@latest add https://ui.shadcn.com/r/contribution-calendar
+// npx shadcn@latest add http://localhost:3000/r/github-calendar.json
 
-import { ContributionCalendar } from "@/components/ui/contribution-calendar"
+import { GitHubCalendar } from "@/components/ui/github-calendar"
 
-// Option A — pass your own data
-const data = [
-  { date: "2025-01-01", count: 4 },
-  { date: "2025-01-02", count: 7 },
-  // ... 365 days
-]
-
-// Option B — pass a GitHub username (fetches automatically)
 export default function App() {
   return (
-    <ContributionCalendar
-      githubUsername="om2309"
+    <GitHubCalendar
+      username="om2309"
       colorScheme="green"
       cellSize={14}
       cellShape="square"

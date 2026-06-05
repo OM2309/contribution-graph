@@ -4,7 +4,8 @@ import React from "react";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-import type { CalendarControlsState, CellShape, ColorScheme, WeekStart } from "./types";
+import type { CalendarControlsState } from "./types";
+import type { CellShape, ColorScheme, WeekStart } from "@/components/ui/github-calendar";
 
 // ── Color swatches ────────────────────────────────────────────────────────────
 const COLOR_SWATCHES: { scheme: ColorScheme; color: string; label: string }[] = [
@@ -230,13 +231,6 @@ export function CustomizationPanel({ controls, onChange }: CustomizationPanelPro
             label="Staggered Animation"
             checked={controls.animate}
             onCheckedChange={(v) => onChange("animate", v)}
-          />
-
-          <ToggleRow
-            id="paint-mode"
-            label="Paint / Draw Mode"
-            checked={controls.paintMode}
-            onCheckedChange={(v) => onChange("paintMode", v)}
           />
         </div>
       </div>
