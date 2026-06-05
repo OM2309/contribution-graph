@@ -18,7 +18,7 @@ const PROPS: PropRow[] = [
   {
     prop: "colorScheme",
     type: '"green" | "blue" | "purple" | "orange" | "pink" | "dracula" | "halloween"',
-    defaultVal: '"green"',
+    defaultVal: '"blue"',
     description: "Preset theme palette for the levels",
   },
   {
@@ -30,19 +30,19 @@ const PROPS: PropRow[] = [
   {
     prop: "cellSize",
     type: "number",
-    defaultVal: "14",
+    defaultVal: "16",
     description: "Width and height of each grid cell in pixels",
   },
   {
     prop: "cellGap",
     type: "number",
-    defaultVal: "3",
+    defaultVal: "4",
     description: "Spacing between grid cells in pixels",
   },
   {
     prop: "cellShape",
     type: '"square" | "circle" | "rounded"',
-    defaultVal: '"square"',
+    defaultVal: '"circle"',
     description: "Shape styling for each contribution cell",
   },
   {
@@ -78,7 +78,7 @@ const PROPS: PropRow[] = [
   {
     prop: "timeRange",
     type: '"3-months" | "6-months" | "1-year"',
-    defaultVal: '"1-year"',
+    defaultVal: '"3-months"',
     description: "Adjusts the historical date limit shown in the calendar",
   },
   {

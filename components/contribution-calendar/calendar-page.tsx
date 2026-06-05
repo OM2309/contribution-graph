@@ -162,16 +162,16 @@ export function CalendarPage({ initialData, githubUsername }: CalendarPageProps)
 
   // ── Customization controls ────────────────────────────────────────────────
   const [controls, setControls] = useState<CalendarControlsState>({
-    colorScheme: "green",
-    cellShape: "square",
-    cellSize: 14,
-    cellGap: 3,
+    colorScheme: "blue",
+    cellShape: "circle",
+    cellSize: 16,
+    cellGap: 4,
     showTooltip: true,
     showMonthLabels: true,
     showDayLabels: true,
     weekStart: "sun",
     animate: false,
-    timeRange: "1-year",
+    timeRange: "3-months",
   });
 
   const handleChange = <K extends keyof CalendarControlsState>(

@@ -96,12 +96,10 @@ export default function App() {
   return (
     <GitHubCalendar
       username="om2309"
-      colorScheme="green"
-      cellSize={14}
-      cellShape="square"
-      showTooltip
-      showMonthLabels
-      showDayLabels
+      colorScheme="blue"
+      cellSize={16}
+      cellShape="circle"
+      timeRange="3-months"
     />
   )
 }`;

@@ -98,17 +98,17 @@ function fmtDate(dateStr: string): string {
 
 export function GitHubCalendar({
   username,
-  colorScheme = "green",
+  colorScheme = "blue",
   colors,
-  cellSize = 14,
-  cellGap = 3,
-  cellShape = "square",
+  cellSize = 16,
+  cellGap = 4,
+  cellShape = "circle",
   showTooltip = true,
   showMonthLabels = true,
   showDayLabels = true,
   weekStart = "sun",
   animate = false,
-  timeRange = "1-year",
+  timeRange = "3-months",
   onDataLoaded,
 }: GitHubCalendarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
