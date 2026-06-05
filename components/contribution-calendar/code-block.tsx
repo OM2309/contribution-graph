@@ -88,7 +88,7 @@ function tokenise(line: string): Token[] {
 
 // ── Default snippet ───────────────────────────────────────────────────────────
 const DEFAULT_CODE = `// Install via shadcn registry
-// npx shadcn@latest add http://localhost:3000/r/github-calendar.json
+// npx shadcn@latest add https://github-calendar-kappa.vercel.app/r/github-calendar.json
 
 import { GitHubCalendar } from "@/components/ui/github-calendar"
 

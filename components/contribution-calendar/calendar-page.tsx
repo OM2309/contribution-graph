@@ -58,7 +58,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 // ─────────────────────────────────────────────────────────────────────────────
 // Install command pill
 // ─────────────────────────────────────────────────────────────────────────────
-const INSTALL_CMD = "npx shadcn@latest add http://localhost:3000/r/github-calendar.json";
+const INSTALL_CMD = "npx shadcn@latest add https://github-calendar-kappa.vercel.app/r/github-calendar.json";
 
 function InstallPill() {
   const [copied, setCopied] = useState(false);
