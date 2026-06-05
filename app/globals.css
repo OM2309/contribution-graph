@@ -60,3 +60,46 @@ body {
 }
 
 /* ── Slider (shadcn base-ui) — remove !important override, handled inline ── */
+
+/* Smooth transition when clicking to a value, but disable during drag for instantaneous feedback */
+[data-slot="slider"]:not([data-dragging]) [data-slot="slider-thumb"] {
+  transition: inset-inline-start 0.15s ease-out, left 0.15s ease-out, right 0.15s ease-out, top 0.15s ease-out, bottom 0.15s ease-out, translate 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+[data-slot="slider"]:not([data-dragging]) [data-slot="slider-range"] {
+  transition: width 0.15s ease-out, left 0.15s ease-out, right 0.15s ease-out, inset-inline-start 0.15s ease-out, inset-inline-end 0.15s ease-out;
+}
+
+/* Smooth calendar grid transitions when resizing cell size or gap size */
+[role="gridcell"] {
+  transition: width 0.2s ease-out, height 0.2s ease-out, border-radius 0.2s ease-out, background-color 0.2s ease-out;
+}
+
+[role="row"] {
+  transition: gap 0.2s ease-out;
+}
+
+[role="grid"] {
+  transition: gap 0.2s ease-out, top 0.2s ease-out, left 0.2s ease-out;
+}
+
+/* Day labels transition */
+.absolute.left-0.flex.flex-col > div {
+  transition: height 0.2s ease-out, margin-bottom 0.2s ease-out;
+}
+
+/* Month labels transition */
+.absolute.top-0 > span {
+  transition: left 0.2s ease-out;
+}
+
+/* Disable transitions entirely on all elements during active slider dragging to prevent lag/rough resizing */
+:root:has([data-dragging]) [role="gridcell"],
+:root:has([data-dragging]) [role="row"],
+:root:has([data-dragging]) [role="grid"],
+:root:has([data-dragging]) .absolute.left-0.flex.flex-col > div,
+:root:has([data-dragging]) .absolute.top-0 > span {
+  transition: none !important;
+}
+
+

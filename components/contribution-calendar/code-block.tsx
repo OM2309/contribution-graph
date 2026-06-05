@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -115,7 +115,7 @@ export default function App() {
 }`;
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export function CodeBlock({
+export const CodeBlock = memo(function CodeBlock({
   code = DEFAULT_CODE,
   className,
 }: {
@@ -188,4 +188,4 @@ export function CodeBlock({
       </pre>
     </div>
   );
-}
+});

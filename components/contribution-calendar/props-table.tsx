@@ -97,7 +97,7 @@ function CodePill({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function PropsTable() {
+export const PropsTable = React.memo(function PropsTable() {
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-800">
       <table className="w-full table-auto border-collapse text-sm" role="table">
@@ -147,4 +147,4 @@ export function PropsTable() {
       </table>
     </div>
   );
-}
+});

@@ -45,6 +45,7 @@ export function ContributionGrid({
   weekStart = "sun",
   onCellClick,
   animate = false,
+  timeRange = "1-year",
 }: ContributionCalendarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState>({
@@ -53,18 +54,36 @@ export function ContributionGrid({
 
   const palette = colors ?? COLOR_THEMES[colorScheme] ?? COLOR_THEMES.green;
 
+  // ── Filter data based on timeRange ────────────────────────────────────────
+  const filteredData = useMemo(() => {
+    if (!data || !data.length) return [];
+
+    const latestDate = new Date();
+    const thresholdDate = new Date(latestDate);
+    if (timeRange === "3-months") {
+      thresholdDate.setMonth(thresholdDate.getMonth() - 3);
+    } else if (timeRange === "6-months") {
+      thresholdDate.setMonth(thresholdDate.getMonth() - 6);
+    } else {
+      thresholdDate.setFullYear(thresholdDate.getFullYear() - 1);
+    }
+
+    const thresholdStr = thresholdDate.toISOString().split("T")[0];
+    return data.filter((day) => day.date >= thresholdStr);
+  }, [data, timeRange]);
+
   // ── Build week columns ────────────────────────────────────────────────────
   const weeks = useMemo(() => {
     const grid: (ContributionDay | null)[][] = [];
-    if (!data.length) return grid;
+    if (!filteredData.length) return grid;
 
-    const firstDate = new Date(data[0].date + "T00:00:00");
+    const firstDate = new Date(filteredData[0].date + "T00:00:00");
     const dow = firstDate.getDay();
     const offset = weekStart === "sun" ? dow : (dow + 6) % 7;
 
     let week: (ContributionDay | null)[] = [];
     for (let i = 0; i < offset; i++) week.push(null);
-    for (const day of data) {
+    for (const day of filteredData) {
       week.push(day);
       if (week.length === 7) { grid.push(week); week = []; }
     }
@@ -73,7 +92,7 @@ export function ContributionGrid({
       grid.push(week);
     }
     return grid;
-  }, [data, weekStart]);
+  }, [filteredData, weekStart]);
 
   // ── Month label positions ─────────────────────────────────────────────────
   const monthPositions = useMemo(() => {
@@ -168,7 +187,7 @@ export function ContributionGrid({
 
       {/* ── Cell grid ──────────────────────────────────────────────────── */}
       <motion.div
-        key={String(animate)}
+        key={`${animate}-${weeks.length}`}
         className="absolute flex"
         style={{ top: TOP, left: LEFT, gap: cellGap }}
         role="grid"

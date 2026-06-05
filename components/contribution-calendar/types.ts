@@ -2,7 +2,7 @@ import type { ContributionDay } from "@/lib/contribution-data";
 
 export type CellShape = "square" | "circle" | "rounded";
 export type WeekStart = "sun" | "mon";
-export type ColorScheme = "green" | "blue" | "purple" | "orange" | "pink";
+export type ColorScheme = "green" | "blue" | "purple" | "orange" | "pink" | "dracula" | "halloween";
 
 export interface ContributionCalendarProps {
   /** Array of date + count objects — required */
@@ -31,6 +31,8 @@ export interface ContributionCalendarProps {
   onCellClick?: (day: ContributionDay) => void;
   /** Staggered scale-in animation via Motion */
   animate?: boolean;
+  /** Time range to display in the grid */
+  timeRange?: "3-months" | "6-months" | "1-year";
 }
 
 export interface CalendarControlsState {
@@ -43,4 +45,7 @@ export interface CalendarControlsState {
   showDayLabels: boolean;
   weekStart: WeekStart;
   animate: boolean;
+  timeRange: "3-months" | "6-months" | "1-year";
+  paintMode: boolean;
 }
+

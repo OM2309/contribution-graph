@@ -13,6 +13,8 @@ const COLOR_SWATCHES: { scheme: ColorScheme; color: string; label: string }[] = 
   { scheme: "purple", color: "#a855f7", label: "Purple" },
   { scheme: "orange", color: "#f97316", label: "Orange" },
   { scheme: "pink",   color: "#ec4899", label: "Pink"   },
+  { scheme: "dracula", color: "#bd93f9", label: "Dracula" },
+  { scheme: "halloween", color: "#fa7a18", label: "Halloween" },
 ];
 
 // ── Cell shapes ───────────────────────────────────────────────────────────────
@@ -171,6 +173,20 @@ export function CustomizationPanel({ controls, onChange }: CustomizationPanelPro
               aria-label="Gap size"
             />
           </div>
+
+          {/* Time Range */}
+          <div className="flex flex-col gap-3">
+            <ControlLabel>Time Range</ControlLabel>
+            <SegmentedGroup
+              options={[
+                { value: "1-year", label: "1 Year" },
+                { value: "6-months", label: "6 Months" },
+                { value: "3-months", label: "3 Months" },
+              ]}
+              value={controls.timeRange}
+              onChange={(v) => onChange("timeRange", v)}
+            />
+          </div>
         </div>
 
         {/* ── RIGHT COLUMN ────────────────────────────────────────────── */}
@@ -214,6 +230,13 @@ export function CustomizationPanel({ controls, onChange }: CustomizationPanelPro
             label="Staggered Animation"
             checked={controls.animate}
             onCheckedChange={(v) => onChange("animate", v)}
+          />
+
+          <ToggleRow
+            id="paint-mode"
+            label="Paint / Draw Mode"
+            checked={controls.paintMode}
+            onCheckedChange={(v) => onChange("paintMode", v)}
           />
         </div>
       </div>

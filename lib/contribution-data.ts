@@ -61,6 +61,8 @@ export const COLOR_THEMES: Record<string, [string, string, string, string, strin
   purple: ["#27272a", "#4a1d96", "#7c3aed", "#a855f7", "#d8b4fe"],
   orange: ["#27272a", "#7c2d12", "#c2410c", "#f97316", "#fdba74"],
   pink: ["#27272a", "#831843", "#be185d", "#ec4899", "#f9a8d4"],
+  dracula: ["#282a36", "#44475a", "#6272a4", "#bd93f9", "#50fa7b"],
+  halloween: ["#21262d", "#631c03", "#bd5604", "#fa7a18", "#f9f871"],
 };
 
 /** Total contributions sum */
