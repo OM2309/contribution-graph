@@ -286,7 +286,7 @@ export function CalendarPage({ initialData, githubUsername }: CalendarPageProps)
         </section>
 
         {/* ── 3. STATS ──────────────────────────────────────────────── */}
-        <section aria-label="Statistics" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {/* <section aria-label="Statistics" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard label="Total Active Days" value={stats.active.toString()} sub="+12% from last year" />
           <StatCard
             label="Longest Streak"
@@ -298,7 +298,7 @@ export function CalendarPage({ initialData, githubUsername }: CalendarPageProps)
             }
           />
           <StatCard label="Current Streak" value={`${stats.current} days`} sub="Keep it going" />
-        </section>
+        </section> */}
 
         <Separator className="bg-zinc-800" />
 
